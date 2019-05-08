@@ -1,9 +1,6 @@
 # Home-Connect
 Team A Web Application for BITS-OUA-119
 
-
-
-=======
 ## Getting Started
 Ensure you have the latest version of PHP, MySQL & Apache intalled on your local machine.
 * Clone the repo
