@@ -11,8 +11,6 @@
 		$conn = new PDO("mysql:host=$servername;dbname=$database", $uname, $pword);
 		// set the PDO error mode to exception
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		//Remove echo line after successful testing
-		echo "Connected successfully";
 	}
 	//Connection failed, find out why
 	catch(PDOException $e)
