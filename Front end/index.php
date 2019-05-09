@@ -1,4 +1,20 @@
-<!doctype html>
+<?php
+	
+	if(!isset($_SESSION)){session_start();}
+	require_once('eform.php');
+	
+	
+	
+	if (isset($_SESSION['id_loggedIn']))
+	{
+		$userloggedin = firstName($_SESSION['id_loggedIn']);
+	}
+	else
+	{
+		unset($userloggedin);
+	}
+	
+?>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
@@ -12,7 +28,7 @@
     <title>Home Connect</title>
   </head>
   <body>
-  <div id="myNav" class="overlay">
+  <!--<div id="myNav" class="overlay">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <div class="overlay-content">
       <a href="#">File Sharing</a>
@@ -20,11 +36,27 @@
       <a href="#">Settings</a>
       <a href="#">Logout</a>
     </div>
-  </div>
+  </div> -->
   <div>
-    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
-    <img src='../media/HomeConnectLogo.png' alt='HomeConnectLogo' height=80>
-    <span class="float-right"><a class="btn btn-primary" href="signin.php" role="button">Sign in</a></span>
+    <!--<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>-->
+   	<img src='../media/HomeConnectLogo.png' alt='HomeConnectLogo' height=80>
+    <span class="float-right">
+		<?php if(isset($userloggedin)){?>
+			<ul class="navbar-nav">
+				<li class="nav-item dropdown">
+					<a class="btn btn-primary" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo "Hi $userloggedin"; ?></a>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					  <a class="dropdown-item" href="#">File Sharing</a>
+					  <a class="dropdown-item" href="#">Profile</a>
+					  <a class="dropdown-item" href="#">Settings</a>
+					  <a class="dropdown-item" href="logout.php">Logout</a>
+					</div>
+				</li>
+			</ul>
+		<?php } else {?>		
+			<a class="btn btn-primary" href="signin.php" role="button">Sign in</a>
+		<?php } ?>
+	</span>
   </div>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
