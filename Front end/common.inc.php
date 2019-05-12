@@ -38,6 +38,8 @@
         {
             unset($_SESSION[$key]);
         }
+
+    	Redirect("index.php");
     }
 
     // closing tag purposefully ommitted, just to aviod accidental outputs
