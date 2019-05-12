@@ -70,23 +70,13 @@ CREATE TABLE FileShares (
 
 CREATE TABLE Maintenance (
     Maintenance_ID INT NOT NULL AUTO_INCREMENT,
-    Status VARCHAR(20) NOT NULL,
-    Catagory VARCHAR(50) NOT NULL,
+    Property_ID INT NOT NULL,
     Description TEXT NOT NULL,
-    PRIMARY KEY (Maintenance_ID)
-);
-
-CREATE TABLE MaintenanceRecords (
-    MaintenanceRecord_ID INT NOT NULL AUTO_INCREMENT,
-    M_Property_ID INT NOT NULL,
-    M_Maintenance_ID INT NOT NULL,
-    MaintenanceStart DATETIME NOT NULL,
+    MaintenanceStart DATETIME NULL,
     MaintenanceEnd DATETIME NULL,
-    PRIMARY KEY (MaintenanceRecord_ID),
-    FOREIGN KEY (M_Property_ID)
-        REFERENCES RentedProperties (Property_ID),
-    FOREIGN KEY (M_Maintenance_ID)
-        REFERENCES Maintenance (Maintenance_ID)
+    MaintenanceStatus ENUM('Pending', 'Started', 'Completed', 'Abandoned', 'FollowUp') NOT NULL,
+    PRIMARY KEY (Maintenance_ID),
+    FOREIGN KEY (Property_ID) REFERENCES RentedProperties (Property_ID)
 );
 
 CREATE TABLE ChatSession (
@@ -101,3 +91,14 @@ CREATE TABLE ChatSession (
     FOREIGN KEY (UserTwo_ID)
         REFERENCES Users (User_ID)
 );
+
+-- add user and grant permissions 
+DROP USER IF EXISTS 'id20190501_multipass'@'localhost';
+
+CREATE USER 'id20190501_multipass'@'localhost' IDENTIFIED 
+WITH mysql_native_password 
+BY '2019Home@Connect';
+
+GRANT ALL PRIVILEGES 
+ON id20190501_homeconnect.* 
+TO 'id20190501_multipass'@'localhost';
