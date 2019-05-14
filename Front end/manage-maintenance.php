@@ -4,7 +4,6 @@
   require_once "check_login.php";
 
 ?>
-<!doctype html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
