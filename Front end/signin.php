@@ -1,8 +1,8 @@
 <?php
 	
-	if(!isset($_SESSION)){session_start();}
-	require_once('eform.php');
-	
+  require_once "config.inc.php";
+  require_once "common.inc.php";
+	require_once "eform.php";
 	
 	$in=0;
 	$errors = "";
@@ -29,15 +29,18 @@
 		elseif ($in<3)
 		{
 			$error = "Incorrect username or password, you have ".$in." attempts left";
-			
 		}
 		else
 		{
-			echo $in;
-			exit;
-			//header("Location: http://localhost:81/Team-A/Frontend/index.php");
-		}
-		
+			if(isset($_SESSION['requested_url']))
+			{
+				Redirect($_SESSION['requested_url']);
+			}
+			else
+			{
+				Redirect("index.php");
+			}
+		}		
 	}
 ?>
 <html lang="en">

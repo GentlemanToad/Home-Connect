@@ -1,6 +1,7 @@
 <?php
   require_once "config.inc.php";
   require_once "common.inc.php";
+  require_once "check_login.php";
 
 ?>
 <!doctype html>
@@ -24,10 +25,7 @@
     <?php include_once "nav.php" ?>
 
     <div class="container">
-      <h1>About</h1>
-      <p>
-        Some description about what home connect is about
-      </p>
+      <h1>Add a maintenance</h1>
     </div>
 
     <?php include_once "footer.php" ?>
