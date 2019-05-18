@@ -2,6 +2,9 @@
 
     include_once "database.inc.php";
 
+    /**
+     * Get user by user ID
+     */
     function GetUser($userId)
     {
         $conn = Database::getInstance();
@@ -20,18 +23,59 @@
         );
     }
 
+    /**
+     * Get address from the database row
+     */
+    function GetAddress($row)
+    {
+        $address = $row->AddressLine1;
+        if($row->AddressLine2)
+        {
+        $addess .= ", " . $row->AddressLine2;
+        }
+
+        return $address . ", " . $row->Suburb . ", " . $row->P_State . " " . $row->PostCode;
+    }
+
+    /**
+     * Converting an array to list of options of a select element
+     * optionally match the selected value for updates
+     */
+    function ToSelectOptions($arr, $selectedValue = '')
+    {
+        $options = '';
+        foreach ($arr as $value)
+        {
+            if($value == $selectedValue)
+            {
+                $options .= '<option value="' . $value . '" selected>' . $value . '</option>';
+            }
+            else
+            {
+                $options .= '<option value="' . $value . '">' . $value . '</option>';
+            }
+        }
+
+        return $options;
+    }
+
     function GetLoggedInUserId()
     {
         return $_SESSION[C_SESSION_USER_ID_KEY];
     }
 
-    // redirect browser to a page/location
+    /**
+     * Redirect browser to a page/location
+     */
     function Redirect($location)
     {
         header("location: " . $location);
         exit;
     }
 
+    /**
+     * Logout user by clearing the session
+     */
     function Logout()
     {
         foreach ($_SESSION as $key => $value) 
