@@ -51,17 +51,6 @@
     }
   }
 
-  function GetAddress($row)
-  {
-    $address = $row->AddressLine1;
-    if($row->AddressLine2)
-    {
-      $addess .= ", " . $row->AddressLine2;
-    }
-
-    return $address . ", " . $row->Suburb . ", " . $row->P_State . " " . $row->PostCode;
-  }
-
 ?>
 <!doctype html>
 <html lang="en">
