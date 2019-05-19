@@ -107,5 +107,46 @@
 		exit;
 	}
 	
-
+	function writeChatSession($message)
+	{
+		$stuserid = $_SESSION['id_loggedIn'];
+		$userotherid=null;
+		
+		include 'connect.php';
+		
+		$stquery = $conn->prepare("SELECT Landlord_User_ID, Tenants_ID, RentedProperty_ID, RentEnd FROM Renter WHERE Landlord_User_ID=:stuserid OR Tenants_ID=:stuserid"); //sql query to return memberid based on email address
+		$stquery->bindParam(':stuserid',$stuserid,PDO::PARAM_STR);
+		$stquery->execute(); //run the sql query
+		
+		if($stquery->rowCount()) //checks to see if an entry has been returned
+		{
+			
+			while($result = $stquery->fetch(PDO::FETCH_ASSOC))
+			{
+				if($result['Landlord_User_ID']==$stuserid && $result['RentEnd']==null)
+				{
+					$userotherid = $result['Tenants_ID'];
+				}
+				elseif($result['Tenants_ID']==$stuserid && $result['RentEnd']==null)
+				{
+					$userotherid = $result['TLandlord_User_ID'];
+				}
+			}
+			
+			$query=$conn->prepare("INSERT INTO chatsession (UserOne_ID, UserTwo_ID, Messages, MessageTime) VALUES (:userone_id,:usertwo_id,:messages,NOW())");
+			$query->bindParam(':userone_id',$stuserid,PDO::PARAM_INT);
+			$query->bindParam(':usertwo_id',$userotherid,PDO::PARAM_INT);
+			$query->bindParam(':messages',$message,PDO::PARAM_STR);
+			$query->execute();
+			$conn=null;
+			return "actioned";
+		}
+		
+		return null;
+		
+		
+	}
+	
 ?>
+
+

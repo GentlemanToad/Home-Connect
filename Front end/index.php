@@ -71,7 +71,7 @@
         <a class="nav-link" href="rental.php">RENTAL</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="chat.php">CHAT</a>
+        <a class="nav-link" href="chatsession.php">CHAT</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="maintenance.php" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
