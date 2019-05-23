@@ -24,6 +24,14 @@
     }
 
     /**
+     * Get logged in user details
+     */
+    function GetLoggedInUser()
+    {
+        return GetUser(GetLoggedInUserId());
+    }
+
+    /**
      * Get address from the database row
      */
     function GetAddress($row)

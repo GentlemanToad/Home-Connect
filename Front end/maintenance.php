@@ -13,13 +13,13 @@
       rp.Suburb,
       rp.P_State,
       PostCode,
-      rp.Landlord_User_ID LandlordId,
-      r.Tenants_ID TenantId,
-      IF(r.Tenants_ID = :UserId, 0, 1) IsLandlord
+      r.Landlord_User_ID LandlordId,
+      r.Tenant_User_ID TenantId,
+      IF(r.Tenant_User_ID = :UserId, 0, 1) IsLandlord
     FROM Maintenance m
-    INNER JOIN RentedProperties rp ON m.Property_ID = rp.Property_ID
-    INNER JOIN Renter r ON rp.Property_ID = r.RentedProperty_ID
-    WHERE (rp.Landlord_User_ID = :UserId OR r.Tenants_ID = :UserId)";
+    INNER JOIN Renter r ON m.Rent_ID = r.Rent_ID
+    INNER JOIN RentedProperties rp ON r.Property_ID = rp.Property_ID
+    WHERE r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId";
   $stmt = $conn->prepare($query);
   $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
   $stmt->execute();
@@ -28,12 +28,13 @@
   $query = "
     SELECT
       rp.*, 
-      rp.Landlord_User_ID LandlordId,
-      r.Tenants_ID TenantId,
-      IF(r.Tenants_ID = :UserId, 0, 1) IsLandlord
+      r.Rent_ID,
+      r.Landlord_User_ID LandlordId,
+      r.Tenant_User_ID TenantId,
+      IF(r.Tenant_User_ID = :UserId, 0, 1) IsLandlord
     FROM RentedProperties rp
-    INNER JOIN Renter r ON rp.Property_ID = r.RentedProperty_ID
-    WHERE (rp.Landlord_User_ID = :UserId OR r.Tenants_ID = :UserId)";
+    INNER JOIN Renter r ON rp.Property_ID = r.Property_ID
+    WHERE r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId";
   $stmt = $conn->prepare($query);
   $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
   $stmt->execute();
@@ -52,7 +53,6 @@
   }
 
 ?>
-<!doctype html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
@@ -84,7 +84,7 @@
           </button>
           <div class="dropdown-menu dropdown-menu-right">
             <?php foreach ($landlordProperties as $row) { ?>
-              <a class="dropdown-item" href="add-maintenance.php?propertyId=<?=$row->Property_ID ?>">
+              <a class="dropdown-item" href="add-maintenance.php?rentId=<?=$row->Rent_ID ?>">
                 <i class="fa fa-home" style="color: #721c24"></i> <?=GetAddress($row) ?>
               </a>
             <?php } ?>
@@ -94,7 +94,7 @@
             <?php } ?>
 
             <?php foreach ($tenantProperties as $row) { ?>
-              <a class="dropdown-item" href="add-maintenance.php?propertyId=<?=$row->Property_ID ?>">
+              <a class="dropdown-item" href="add-maintenance.php?rentId=<?=$row->Rent_ID ?>">
                 <i class="fa fa-home" style="color: #0c5460"></i> 
                 <span><?=GetAddress($row) ?></span>
               </a>

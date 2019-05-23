@@ -5,11 +5,11 @@
 
   if($_SERVER['REQUEST_METHOD'] === 'POST')
   {
-    $propertyId = $_POST['propertyId'];
+    $rentId = $_POST['rentId'];
   }
   else
   {
-    $propertyId = $_GET['propertyId'];
+    $rentId = $_GET['rentId'];
   }
 
   $conn = Database::getInstance();
@@ -17,13 +17,13 @@
   $query = "
     SELECT rp.* 
     FROM RentedProperties rp
-    INNER JOIN Renter r ON rp.Property_ID = r.RentedProperty_ID
+    INNER JOIN Renter r ON rp.Property_ID = r.Property_ID
     WHERE 
-      (rp.Landlord_User_ID = :UserId OR r.Tenants_ID = :UserId) AND
-      rp.Property_ID = :PropertyId";
+      (r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId) AND
+      r.Rent_ID = :RentId";
   $stmt = $conn->prepare($query);
   $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
-  $stmt->bindPARAM(":PropertyId", $propertyId, PDO::PARAM_INT);
+  $stmt->bindPARAM(":RentId", $rentId, PDO::PARAM_INT);
   $stmt->execute();
   $rentedProperty = $stmt->fetchAll(PDO::FETCH_OBJ)[0];
 
@@ -31,15 +31,15 @@
   {
     $query = "
       INSERT INTO Maintenance (
-        Property_ID, 
+        Rent_ID, 
         Description,
         MaintenanceStatus)
       VALUES (
-        :PropertyId, 
+        :RentId, 
         :Description, 
         'Pending')";
     $stmt = $conn->prepare($query);
-    $stmt->bindPARAM(":PropertyId", $propertyId, PDO::PARAM_INT);
+    $stmt->bindPARAM(":RentId", $rentId, PDO::PARAM_INT);
     $stmt->bindPARAM(":Description", $_POST['description'], PDO::PARAM_STR);
     $stmt->execute();
 
@@ -72,7 +72,7 @@
       <h1><?=GetAddress($rentedProperty) ?></h1>
 
       <form id="manage-maintenance" method="POST">
-        <input type="hidden" name="propertyId" value="<?=$propertyId ?>" />
+        <input type="hidden" name="rentId" value="<?=$rentId ?>" />
         <div class="form-row">
           <div class="form-group col-md-12">
             <label for="start">Description</label>

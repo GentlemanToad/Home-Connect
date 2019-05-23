@@ -22,14 +22,14 @@
       rp.Suburb,
       rp.P_State,
       PostCode,
-      rp.Landlord_User_ID LandlordId,
-      r.Tenants_ID TenantId,
-      IF(r.Tenants_ID = :UserId, 0, 1) IsLandlord
+      r.Landlord_User_ID LandlordId,
+      r.Tenant_User_ID TenantId,
+      IF(r.Tenant_User_ID = :UserId, 0, 1) IsLandlord
     FROM Maintenance m
-    INNER JOIN RentedProperties rp ON m.Property_ID = rp.Property_ID
-    INNER JOIN Renter r ON rp.Property_ID = r.RentedProperty_ID
+    INNER JOIN Renter r ON m.Rent_ID = r.Rent_ID
+    INNER JOIN RentedProperties rp ON r.Property_ID = rp.Property_ID
     WHERE 
-      (rp.Landlord_User_ID = :UserId OR r.Tenants_ID = :UserId) AND
+      (r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId) AND
       m.Maintenance_ID = :MaintenanceId";
   $stmt = $conn->prepare($query);
   $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);

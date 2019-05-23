@@ -29,38 +29,48 @@ SELECT @TenantId1 := User_ID FROM Users WHERE Email = @TenantEmail1;
 SELECT @TenantId2 := User_ID FROM Users WHERE Email = @TenantEmail2;
 
 INSERT INTO RentedProperties(
-    Landlord_User_ID,
     AddressLine1,
     Suburb,
     P_State,
     PostCode
 ) VALUES
-(@LandlordId1, '55 Durrant Street', 'Brighton', 'VIC', 3186),
-(@LandlordId1, '111 Abbott Street', 'Sandringham', 'VIC', 3191),
-(@LandlordId2, '59 Jasper Road', 'Bentley', 'VIC', 3204);
+('55 Durrant Street', 'Brighton', 'VIC', 3186),
+('111 Abbott Street', 'Sandringham', 'VIC', 3191),
+('59 Jasper Road', 'Bentley', 'VIC', 3204);
 
 SELECT @PropertyId1 := Property_ID FROM RentedProperties WHERE PostCode = 3186;
 SELECT @PropertyId2 := Property_ID FROM RentedProperties WHERE PostCode = 3191;
 SELECT @PropertyId3 := Property_ID FROM RentedProperties WHERE PostCode = 3204;
 
 INSERT INTO Renter (
-    Tenants_ID,
-    RentedProperty_ID,
+    Landlord_User_ID,
+    Tenant_User_ID,
+    Property_ID,
     RentStart,
     RentEnd
 ) VALUES 
-(@TenantId1, @PropertyId1, '2018-10-10', null),
-(@TenantId2, @PropertyId2, '2017-04-12', null),
-(@LandlordId1, @PropertyId3, '2017-09-10', '2020-10-17');
+(@LandlordId1, @TenantId1, @PropertyId1, '2018-10-10', null),
+(@LandlordId1, @TenantId2, @PropertyId2, '2017-04-12', null),
+(@LandlordId2, @LandlordId1, @PropertyId3, '2017-09-10', '2020-10-17');
+
+SELECT @Rent1 := Rent_ID 
+    FROM Renter 
+    WHERE Landlord_User_ID = @LandlordId1 AND Tenant_User_ID = @TenantId1 AND Property_ID = @PropertyId1;
+SELECT @Rent2 := Rent_ID 
+    FROM Renter 
+    WHERE Landlord_User_ID = @LandlordId1 AND Tenant_User_ID = @TenantId2 AND Property_ID = @PropertyId2;
+SELECT @Rent3 := Rent_ID 
+    FROM Renter 
+    WHERE Landlord_User_ID = @LandlordId2 AND Tenant_User_ID = @LandlordId1 AND Property_ID = @PropertyId3;
 
 INSERT INTO Maintenance (
-    Property_ID,
+    Rent_ID,
     Description,
     MaintenanceStart,
     MaintenanceEnd,
     MaintenanceStatus
 ) VALUES
-(@PropertyId1, 'Please fix my boiler', '2019-02-01', '2019-02-12', 'Completed'),
-(@PropertyId1, 'Please fix my gas', '2019-01-30', '2019-05-04', 'Pending'),
-(@PropertyId2, 'Bathroom door is broken', '2019-04-23', '2019-05-12', 'Pending'),
-(@PropertyId3, 'Please fix my boiler', '2019-01-30', null, 'Pending');
+(@Rent1, 'Please fix my boiler', '2019-02-01', '2019-02-12', 'Completed'),
+(@Rent1, 'Please fix my gas', '2019-01-30', '2019-05-04', 'Pending'),
+(@Rent2, 'Bathroom door is broken', '2019-04-23', '2019-05-12', 'Pending'),
+(@Rent3, 'Please fix my boiler', '2019-01-30', null, 'Pending');
