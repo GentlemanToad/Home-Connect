@@ -1,6 +1,8 @@
 <?php
-	
-	if(!isset($_SESSION)){session_start();}
+  require_once "config.inc.php";
+  require_once "common.inc.php";
+  
+  if(!isset($_SESSION)){session_start();}
 	require_once('eform.php');
 	
 	
@@ -13,7 +15,7 @@
 	{
 		unset($userloggedin);
 	}
-	
+
 ?>
 <html lang="en">
   <head>
@@ -28,14 +30,19 @@
     <title>Home Connect</title>
   </head>
   <body>
-  <!--<div id="myNav" class="overlay">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <div class="overlay-content">
-      <a href="#">File Sharing</a>
-      <a href="#">Profile</a>
-      <a href="#">Settings</a>
-      <a href="#">Logout</a>
+    <div>
+        <img src='../media/HomeConnectLogo.png' alt='HomeConnectLogo' height=80>
     </div>
+
+    <?php include_once "nav.php" ?>
+
+    <div class="container">
+      <h1>About</h1>
+      <p>
+        Some description about what home connect is about
+      </p>
+    </div>
+<<<<<<< HEAD
   </div> -->
   <div>
     <!--<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>-->
@@ -109,5 +116,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="app.js"></script>
-  </body>
+ </body>
 </html>
