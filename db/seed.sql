@@ -18,10 +18,10 @@ INSERT INTO Users (
     DateCreated,
     DateModified
 ) VALUES 
-('Landlord1', 'HC', @LandlordEmail1, '0444888888', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW()),
-('Landlord2', 'HC', @LandlordEmail2, '0444888888', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW()),
-('Tenant1', 'HC', @TenantEmail1, '0444999999', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW()),
-('Tenant2', 'HC', @TenantEmail2, '0444999999', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW());
+('James', 'Bond', @LandlordEmail1, '0444888888', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW()),
+('Jon', 'Snow', @LandlordEmail2, '0444888888', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW()),
+('Arya', 'Stark', @TenantEmail1, '0444999999', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW()),
+('Jason', 'Bourne', @TenantEmail2, '0444999999', SHA1(@Password), SHA1(@Password), 0, 1, NOW(), NOW());
 
 SELECT @LandlordId1 := User_ID FROM Users WHERE Email = @LandlordEmail1;
 SELECT @LandlordId2 := User_ID FROM Users WHERE Email = @LandlordEmail2;
@@ -74,3 +74,19 @@ INSERT INTO Maintenance (
 (@Rent1, 'Please fix my gas', '2019-01-30', '2019-05-04', 'Pending'),
 (@Rent2, 'Bathroom door is broken', '2019-04-23', '2019-05-12', 'Pending'),
 (@Rent3, 'Please fix my boiler', '2019-01-30', null, 'Pending');
+
+INSERT INTO ChatSession (
+    Rent_ID,
+    From_User_ID,
+    To_User_ID,
+    Message,
+    MessageTime
+) VALUES
+(@Rent1, @TenantId1, @LandlordId1, 'Hi', CURRENT_TIMESTAMP()),
+(@Rent1, @LandlordId1, @TenantId1, 'Hi, how is everything?', CURRENT_TIMESTAMP()),
+(@Rent1, @TenantId1, @LandlordId1, 'We have a schduled maintanance next Monday, is there any chance we can move it?', CURRENT_TIMESTAMP()),
+(@Rent1, @LandlordId1, @TenantId1, 'I guess I can, when would you be available?', CURRENT_TIMESTAMP()),
+(@Rent1, @TenantId1, @LandlordId1, 'How about next, Friday?', CURRENT_TIMESTAMP()),
+(@Rent1, @LandlordId1, @TenantId1, 'That looks good on my calandar, let us move then.', CURRENT_TIMESTAMP()),
+(@Rent1, @LandlordId1, @TenantId1, 'done!', CURRENT_TIMESTAMP()),
+(@Rent1, @TenantId1, @LandlordId1, 'Thanks, you are a star.', CURRENT_TIMESTAMP());

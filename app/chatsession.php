@@ -4,6 +4,22 @@
     require_once "check_login.php";
 
     $rentId = $_GET["rentId"];
+
+    $conn = Database::getInstance();
+    $userId = GetLoggedInUserId();
+    $query = "
+        SELECT 
+            rp.*
+        FROM Renter r
+        INNER JOIN RentedProperties rp ON r.Property_ID = rp.Property_ID
+        WHERE 
+            (r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId) AND
+            r.Rent_ID = :RentId";
+    $stmt = $conn->prepare($query);
+    $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
+    $stmt->bindPARAM(":RentId", $rentId, PDO::PARAM_INT);
+    $stmt->execute();
+    $rentedProperty = $stmt->fetchAll(PDO::FETCH_OBJ)[0];
     
 ?>
 
@@ -29,7 +45,9 @@
 
     <div class="container">
 
-        <h1>Welcome - <?=GetLoggedInUser()["FullName"] ?></h1>
+        <h3>
+            <i class="fa fa-home"></i> <?=GetAddress($rentedProperty) ?>
+        </h3>
 
         <form class="form" id="chat-form" method="POST">
             <div class="chat">
@@ -63,7 +81,7 @@
         });
 
 		$(document).ready(function() {
-            var chatInterval = 2500; //refresh interval in ms
+            var chatInterval = 1000; //refresh interval in ms
             var $chatOutput = $("#chatOutput");
             var $chatSend = $("#chatSend");
             
@@ -73,6 +91,7 @@
                 });
             }
 
+            retrieveMessages(); // retrive imediately
 
             setInterval(function() {
                 retrieveMessages();
