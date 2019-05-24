@@ -18,7 +18,8 @@
         INNER JOIN Users u ON c.From_User_ID = u.User_ID
         WHERE 
             (From_User_ID = :UserId OR To_User_ID = :UserId) AND
-            Rent_Id = :RentId";
+            Rent_Id = :RentId
+        ORDER BY c.MessageTime ASC";
     $stmt = $conn->prepare($query);
     $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
     $stmt->bindPARAM(":RentId", $_GET["rentId"], PDO::PARAM_INT);
