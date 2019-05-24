@@ -2,7 +2,7 @@
 	// Function returns logged in members first name from database using userID
 	function firstName($userID)
 	{
-		include 'connect.php'; //connect to database
+		$conn = Database::getInstance();
 		$stmt=$conn->prepare("SELECT FirstName FROM Users WHERE User_ID=:userid");
 		$stmt->bindPARAM(":userid",$userID, PDO::PARAM_INT);
 		$stmt->execute();
@@ -11,18 +11,16 @@
 		if($rcount>0)
 		{
 			$firstname=$row->FirstName;
-			$conn=null; //disconnect database
 			return $firstname;
 		}
-		$conn=null; //disconnect database
 		return null;
 	}
 	
 	// Function to check members username and password against database and set login session if correct otherwise return error
 	function loginMember($email,$password)
 	{
+		$conn = Database::getInstance();
 		$pass = sha1(trim($password)); //remove white space and predefined characters from entered password
-		include 'connect.php';  //connect to database
 		$stcount=$conn->prepare("SELECT User_ID FROM Users WHERE email=:email"); //sql query to return memberid based on email address
 		$stcount->bindPARAM(":email",$email,PDO::PARAM_STR); //binding email to php variable
 		$stcount->execute(); //run the sql query
@@ -36,7 +34,6 @@
 			//check if session userid is set and contains the user_ID value
 			if(isset($_SESSION["id_loggedIn"]) && $_SESSION["id_loggedIn"]==$userID)
 			{
-				$conn = null; //disconnect database
 				return "Logged in already"; //return message member already logged in
 			}
 			
@@ -60,7 +57,6 @@
 					$stattempt->execute(); //run the sql query
 					$_SESSION['id_loggedIn']="$userID"; //id_loggedIn session is assigned memberid as user details entered are a match
 					//session_write_close();
-					$conn = null; //database is disconnected
 					return 10;
 				}
 				else
@@ -73,14 +69,12 @@
 						$dbcount = 2 - $attemptnum;
 						unset($_SESSION["id_loggedIn"]); //id_loggedIn session is assigned a null as user's password entered did not match
 						$_SESSION["numberattempt"]=$dbcount;
-						$conn = null;
 						return $dbcount;
 					}
 					else
 					{
 						unset($_SESSION["id_loggedIn"]); //id_loggedIn session is assigned a null as user's password entered did not match
 						$_SESSION['attempttomany']=1; //set session to show member exceeded number of login attempts
-						$conn = null;
 						return 3;
 					}
 				}
@@ -94,7 +88,6 @@
 			}
 		}
 		
-		$conn=null; //disconnect database
 		return "Not Exist";
 	}
 	
@@ -106,15 +99,22 @@
 		header("Location:  http://localhost:81/Team-A/Frontend/index.php"); //go to home page
 		exit;
 	}
-	
+
 	function writeChatSession($message)
 	{
 		$stuserid = $_SESSION['id_loggedIn'];
 		$userotherid=null;
 		
-		include 'connect.php';
+		$conn = Database::getInstance();
 		
-		$stquery = $conn->prepare("SELECT Landlord_User_ID, Tenants_ID, RentedProperty_ID, RentEnd FROM Renter WHERE Landlord_User_ID=:stuserid OR Tenants_ID=:stuserid"); //sql query to return memberid based on email address
+		$stquery = $conn->prepare("
+			SELECT 
+				Landlord_User_ID, 
+				Tenants_ID, 
+				RentedProperty_ID, 
+				RentEnd 
+			FROM Renter 
+			WHERE Landlord_User_ID=:stuserid OR Tenants_ID=:stuserid"); //sql query to return memberid based on email address
 		$stquery->bindParam(':stuserid',$stuserid,PDO::PARAM_STR);
 		$stquery->execute(); //run the sql query
 		
@@ -142,11 +142,5 @@
 			return "actioned";
 		}
 		
-		return null;
-		
-		
+		return null;		
 	}
-	
-?>
-
-

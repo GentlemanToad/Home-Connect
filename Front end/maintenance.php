@@ -1,4 +1,58 @@
-<!doctype html>
+<?php
+  require_once "config.inc.php";
+  require_once "common.inc.php";
+  require_once "check_login.php";
+
+  $conn = Database::getInstance();
+  $userId = GetLoggedInUserId();
+  $query = "
+    SELECT 
+      m.*, 
+      rp.AddressLine1,
+      rp.AddressLine2,
+      rp.Suburb,
+      rp.P_State,
+      PostCode,
+      r.Landlord_User_ID LandlordId,
+      r.Tenant_User_ID TenantId,
+      IF(r.Tenant_User_ID = :UserId, 0, 1) IsLandlord
+    FROM Maintenance m
+    INNER JOIN Renter r ON m.Rent_ID = r.Rent_ID
+    INNER JOIN RentedProperties rp ON r.Property_ID = rp.Property_ID
+    WHERE r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId";
+  $stmt = $conn->prepare($query);
+  $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
+  $stmt->execute();
+  $maintenance = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+  $query = "
+    SELECT
+      rp.*, 
+      r.Rent_ID,
+      r.Landlord_User_ID LandlordId,
+      r.Tenant_User_ID TenantId,
+      IF(r.Tenant_User_ID = :UserId, 0, 1) IsLandlord
+    FROM RentedProperties rp
+    INNER JOIN Renter r ON rp.Property_ID = r.Property_ID
+    WHERE r.Landlord_User_ID = :UserId OR r.Tenant_User_ID = :UserId";
+  $stmt = $conn->prepare($query);
+  $stmt->bindPARAM(":UserId", $userId, PDO::PARAM_INT);
+  $stmt->execute();
+  $rentedProperties = $stmt->fetchAll(PDO::FETCH_OBJ);
+  $landlordProperties = array();
+  $tenantProperties = array();
+  foreach ($rentedProperties as $row) {
+    if($row->IsLandlord == 1)
+    {
+      array_push($landlordProperties, $row);
+    }
+    else
+    {
+      array_push($tenantProperties, $row);
+    }
+  }
+
+?>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
@@ -7,75 +61,83 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
     <link  type="text/css" rel="stylesheet" href="style.css">
 
     <title>Home Connect</title>
   </head>
   <body>
-  <div id="myNav" class="overlay">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <div class="overlay-content">
-      <a href="#">File Sharing</a>
-      <a href="#">Profile</a>
-      <a href="#">Settings</a>
-      <a href="#">Logout</a>
+    <div>
+        <img src='../media/HomeConnectLogo.png' alt='HomeConnectLogo' height=80>
     </div>
-  </div>
-  <div>
-    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
-    <img src='../media/HomeConnectLogo.png' alt='HomeConnectLogo' height=80>
-    <span class="float-right"><a class="btn btn-primary" href="signin.php" role="button">Sign in</a></span>
-  </div>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="index.php">ABOUT</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="rental.php">RENTAL</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="chat.php">CHAT</a>
-      </li>
-      <li class="nav-item active dropdown">
-        <a class="nav-link dropdown-toggle" href="maintenance.php" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        MAINTENANCE<span class="sr-only">(current)</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-         <a class="dropdown-item" href="#">Request maintenance</a>
-         <a class="dropdown-item" href="#">Schedule maintenance</a>
-         <a class="dropdown-item" href="#">View/Edit maintenance</a>
-         <a class="dropdown-item" href="#">Follow up request</a>
-         <a class="dropdown-item" href="#">Close request</a>
+
+    <?php include_once "nav.php" ?>
+
+    <div class="container">
+
+      <h1>Maintenance</h1>
+
+      <div class="maintenance-actions">
+        <div class="btn-group">
+          <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Add a maintenance
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <?php foreach ($landlordProperties as $row) { ?>
+              <a class="dropdown-item" href="add-maintenance.php?rentId=<?=$row->Rent_ID ?>">
+                <i class="fa fa-home" style="color: #721c24"></i> <?=GetAddress($row) ?>
+              </a>
+            <?php } ?>
+            
+            <?php if(count($landlordProperties) > 0 && count($tenantProperties) > 0){ ?>
+              <div class="dropdown-divider"></div>
+            <?php } ?>
+
+            <?php foreach ($tenantProperties as $row) { ?>
+              <a class="dropdown-item" href="add-maintenance.php?rentId=<?=$row->Rent_ID ?>">
+                <i class="fa fa-home" style="color: #0c5460"></i> 
+                <span><?=GetAddress($row) ?></span>
+              </a>
+            <?php } ?>
+          </div>
         </div>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        REGISTER
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="#">Landlord</a>
-          <a class="dropdown-item" href="#">Tennant</a>
-          <a class="dropdown-item" href="#">Property</a>
-        </div>
-      </li>
-    </ul>
-  </div>
-</nav>
-<footer>
-    <small>
-        &copy; Home Connect by Team A - Building IT Systems 2019
-    </small>
-</footer>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="app.js"></script>
+      </div>
+
+      <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Address</th>
+            <th scope="col">Description</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Status</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach($maintenance as $row) { ?>
+            <tr class="<?=$row->IsLandlord ? "table-secondary" : "" ?>">
+              <th scope="row"><?=$row->AddressLine1 ?></th>
+              <td><?=$row->Description ?></td>
+              <td><?=$row->MaintenanceStart ?></td>
+              <td><?=$row->MaintenanceEnd ?></td>
+              <td>
+                <span class="badge badge-warning">
+                  <?=$row->MaintenanceStatus ?>
+                </span>
+              </td>
+              <td>
+                <a class="btn btn-sm btn-secondary" href="manage-maintenance.php?maintenanceId=<?=$row->Maintenance_ID ?>">
+                  <i class="fas fa-pencil-alt"></i> Manage
+                </a>
+              </td>
+            </tr>
+          <?php } ?>
+        </tbody>
+      </table>
+    </div>
+
+    <?php include_once "footer.php" ?>
+
   </body>
 </html>

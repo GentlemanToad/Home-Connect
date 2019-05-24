@@ -48,6 +48,15 @@
   }
 }
 
+.maintenance-actions {
+  text-align: right;
+  padding-bottom: 5px;
+}
+
+#manage-maintenance label {
+  font-weight: bolder;
+}
+
 /* .navbar {
   overflow: hidden;
   background-color: #333;

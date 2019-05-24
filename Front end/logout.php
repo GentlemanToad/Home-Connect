@@ -1,7 +1,6 @@
 <?php
-	session_start();
-	include ('eform.php');
+	require_once "config.inc.php";
+	require_once "common.inc.php";
 	
-	logoutMember();
-	
+	Logout();	
 ?>
