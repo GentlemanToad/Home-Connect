@@ -19,16 +19,14 @@
     <div>
         <img src='../media/HomeConnectLogo.png' alt='HomeConnectLogo' height=80>
     </div>
-
     <?php include_once "nav.php" ?>
-
-    <div class="container">
-      <h1>About</h1>
-      <p>
-        Some description about what home connect is about
-      </p>
+   
+    <img src='../media/About.png' alt='About' height=300 width =1400>  
+    <p>  &nbsp;&nbsp; Home Connect provides a rental platform for landlords and tenants.<br/Some description about what home connect is about </p>
+    <p>  &nbsp;&nbsp; With Home Connect, landlords and tenants can communicate / manage the property, request maintenance, schedule days and times of maintenance, advertise and vier properties.</p>
+    <p>  &nbsp;&nbsp; Home Connect facilates creation of lease agreements and bonds. </p> 
+    <p>  &nbsp;&nbsp; Home Connect provides better communication between landlords and tenants and helps improve management of rental properties. </p> 
     </div>
-
     <?php include_once "footer.php" ?>
 
   </body>
